@@ -41,3 +41,4 @@ spring-boot-devtools.yml
 
 .gradle/*
 /build/*
+.gradle/

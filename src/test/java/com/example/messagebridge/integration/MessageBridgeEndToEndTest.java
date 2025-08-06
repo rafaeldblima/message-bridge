@@ -117,13 +117,11 @@ class MessageBridgeEndToEndTest {
         
         // Declare the Spring Cloud Stream queues that we expect to exist
         sourceChannel.queueDeclare("source.queue.message-bridge-group", true, false, false, null);
-        destinationChannel.queueDeclare("destination.queue.destination-group", true, false, false, null);
         
         // Purge all queues to ensure clean state - only purge queues that exist
         try { sourceChannel.queuePurge(SOURCE_QUEUE); } catch (Exception e) { }
         try { destinationChannel.queuePurge(DESTINATION_QUEUE); } catch (Exception e) { }
         try { sourceChannel.queuePurge("source.queue.message-bridge-group"); } catch (Exception e) { }
-        try { destinationChannel.queuePurge("destination.queue.destination-group"); } catch (Exception e) { }
     }
 
     @AfterEach
@@ -151,8 +149,8 @@ class MessageBridgeEndToEndTest {
         // Setup consumer for destination queue - try both possible queue names
         BlockingQueue<TestMessage> receivedMessages = new LinkedBlockingQueue<>();
         
-        // Setup consumers on both possible destination queues
-        String consumerTag1 = destinationChannel.basicConsume("destination.queue", true, new DefaultConsumer(destinationChannel) {
+        // Setup consumer on destination queue
+        String consumerTag = destinationChannel.basicConsume("destination.queue", true, new DefaultConsumer(destinationChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
                 String message = new String(body, StandardCharsets.UTF_8);
@@ -160,18 +158,6 @@ class MessageBridgeEndToEndTest {
                 testMsg.payload = message;
                 testMsg.headers = properties.getHeaders() != null ? new HashMap<>(properties.getHeaders()) : new HashMap<>();
                 System.out.println("*** RECEIVED MESSAGE ON destination.queue: " + message);
-                receivedMessages.offer(testMsg);
-            }
-        });
-        
-        String consumerTag2 = destinationChannel.basicConsume("destination.queue.destination-group", true, new DefaultConsumer(destinationChannel) {
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-                String message = new String(body, StandardCharsets.UTF_8);
-                TestMessage testMsg = new TestMessage();
-                testMsg.payload = message;
-                testMsg.headers = properties.getHeaders() != null ? new HashMap<>(properties.getHeaders()) : new HashMap<>();
-                System.out.println("*** RECEIVED MESSAGE ON destination.queue.destination-group: " + message);
                 receivedMessages.offer(testMsg);
             }
         });
@@ -220,8 +206,7 @@ class MessageBridgeEndToEndTest {
         assertThat(receivedMessage.headers.get("x-original-source")).isEqualTo("source");
         assertThat(receivedMessage.headers).containsKey("x-forwarded-timestamp");
         
-        destinationChannel.basicCancel(consumerTag1);
-        destinationChannel.basicCancel(consumerTag2);
+        destinationChannel.basicCancel(consumerTag);
     }
 
     @Test

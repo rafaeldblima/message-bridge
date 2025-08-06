@@ -38,8 +38,6 @@ spring:
         processMessage-out-0:
           destination: destination.queue
           binder: rabbit-destination
-          producer:
-            required-groups: destination-group
       
       rabbit:
         bindings:
