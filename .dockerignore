@@ -1,0 +1,9 @@
+build/
+.gradle/
+*.log
+*.tmp
+*.swp
+.DS_Store
+README.md
+.git/
+.gitignore

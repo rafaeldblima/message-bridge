@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    function:
+      definition: processMessage
+    stream:
+      bindings:
+        processMessage-in-0:
+          destination: test.source
+        processMessage-out-0:
+          destination: test.destination
+      default-binder: test
+
+logging:
+  level:
+    com.example.messagebridge: DEBUG
+    org.springframework.cloud.stream: DEBUG

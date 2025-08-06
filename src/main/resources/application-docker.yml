@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    stream:
+      binders:
+        rabbit-source:
+          environment:
+            spring:
+              rabbitmq:
+                addresses: rabbitmq-source:5672
+                username: admin
+                password: admin123
+                virtual-host: /
+        rabbit-destination:
+          environment:
+            spring:
+              rabbitmq:
+                addresses: rabbitmq-destination:5672
+                username: admin
+                password: admin123
+                virtual-host: /

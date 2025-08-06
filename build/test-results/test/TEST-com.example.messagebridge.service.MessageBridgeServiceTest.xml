@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.messagebridge.service.MessageBridgeServiceTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2025-08-06T18:41:57.570Z" hostname="MacBook-Pro-de-Rafael.local" time="0.026">
+  <properties/>
+  <testcase name="shouldHandleComplexPayloads()" classname="com.example.messagebridge.service.MessageBridgeServiceTest" time="0.023"/>
+  <testcase name="shouldPreserveOriginalHeaders()" classname="com.example.messagebridge.service.MessageBridgeServiceTest" time="0.002"/>
+  <testcase name="shouldProcessMessageFromSource()" classname="com.example.messagebridge.service.MessageBridgeServiceTest" time="0.001"/>
+  <system-out><![CDATA[14:41:57.565 [Test worker] INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.example.messagebridge.service.MessageBridgeServiceTest]: MessageBridgeServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+14:41:57.568 [Test worker] INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.example.messagebridge.MessageBridgeApplication for test class com.example.messagebridge.service.MessageBridgeServiceTest
+14:41:57.572 [Test worker] INFO  c.e.m.service.MessageBridgeService - Received message from source: TestData[id=test-id, content=Test content, value=42]
+14:41:57.573 [Test worker] INFO  c.e.m.service.MessageBridgeService - Successfully processed and forwarded message to destination
+14:41:57.594 [Test worker] INFO  c.e.m.service.MessageBridgeService - Received message from source: Test message with headers
+14:41:57.594 [Test worker] INFO  c.e.m.service.MessageBridgeService - Successfully processed and forwarded message to destination
+14:41:57.596 [Test worker] INFO  c.e.m.service.MessageBridgeService - Received message from source: Test message from source
+14:41:57.596 [Test worker] INFO  c.e.m.service.MessageBridgeService - Successfully processed and forwarded message to destination
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

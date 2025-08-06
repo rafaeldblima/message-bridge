@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: message-bridge-service-integration-test
+  
+  cloud:
+    function:
+      definition: processMessage
+    stream:
+      binders:
+        rabbit-source:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                # Will be overridden by @DynamicPropertySource
+                addresses: localhost:5672
+                username: admin
+                password: admin123
+                virtual-host: /
+        rabbit-destination:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                # Will be overridden by @DynamicPropertySource
+                addresses: localhost:5673
+                username: admin
+                password: admin123
+                virtual-host: /
+      
+      bindings:
+        processMessage-in-0:
+          destination: source.queue
+          group: message-bridge-group
+          binder: rabbit-source
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
+            back-off-multiplier: 2.0
+        processMessage-out-0:
+          destination: destination.queue
+          binder: rabbit-destination
+          producer:
+            required-groups: destination-group
+      
+      rabbit:
+        bindings:
+          processMessage-in-0:
+            consumer:
+              acknowledge-mode: auto
+              durable: true
+              prefetch: 1
+          processMessage-out-0:
+            producer:
+              routing-key-expression: '''destination'''
+              exchange-type: direct
+              durable: true
+
+server:
+  port: 0  # Use random port for tests
+
+logging:
+  level:
+    com.example.messagebridge: DEBUG
+    org.springframework.cloud.stream: INFO
+    org.springframework.amqp: INFO
+    org.testcontainers: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
