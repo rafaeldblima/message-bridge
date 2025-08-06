@@ -1,0 +1,43 @@
+# Maven target directory
+/target/
+
+# IntelliJ IDEA
+/.idea/
+/*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Test containers
+testcontainers.properties
+
+# Build output
+/build/
+
+# Dependency directories
+/node_modules/
+
+# Local configuration
+*.local
+
+# Spring Boot specific
+spring-boot-devtools.properties
+spring-boot-devtools.yml
+
+.gradle/*
+/build/*
