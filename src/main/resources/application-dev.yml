@@ -1,0 +1,20 @@
+spring:
+  cloud:
+    stream:
+      binders:
+        rabbit-source:
+          environment:
+            spring:
+              rabbitmq:
+                addresses: localhost:5672
+                username: guest
+                password: guest
+                virtual-host: /
+        rabbit-destination:
+          environment:
+            spring:
+              rabbitmq:
+                addresses: localhost:5673
+                username: guest
+                password: guest
+                virtual-host: /

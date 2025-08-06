@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   rabbitmq-source:
     image: rabbitmq:3.12-management
@@ -9,13 +7,11 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
       RABBITMQ_DEFAULT_VHOST: /
     volumes:
       - rabbitmq_source_data:/var/lib/rabbitmq
-      - ./docker/rabbitmq/source/definitions.json:/etc/rabbitmq/definitions.json:ro
-      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -32,13 +28,11 @@ services:
       - "5673:5672"
       - "15673:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
       RABBITMQ_DEFAULT_VHOST: /
     volumes:
       - rabbitmq_destination_data:/var/lib/rabbitmq
-      - ./docker/rabbitmq/destination/definitions.json:/etc/rabbitmq/definitions.json:ro
-      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 30s
@@ -47,23 +41,23 @@ services:
     networks:
       - message-bridge-network
 
-  message-bridge-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: message-bridge-service
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    depends_on:
-      rabbitmq-source:
-        condition: service_healthy
-      rabbitmq-destination:
-        condition: service_healthy
-    networks:
-      - message-bridge-network
-    restart: unless-stopped
+#  message-bridge-service:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: message-bridge-service
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+#    depends_on:
+#      rabbitmq-source:
+#        condition: service_healthy
+#      rabbitmq-destination:
+#        condition: service_healthy
+#    networks:
+#      - message-bridge-network
+#    restart: unless-stopped
 
   message-publisher:
     build:
@@ -73,8 +67,8 @@ services:
     environment:
       RABBITMQ_HOST: rabbitmq-source
       RABBITMQ_PORT: 5672
-      RABBITMQ_USER: admin
-      RABBITMQ_PASSWORD: admin123
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
       RABBITMQ_VHOST: /
       PUBLISHER_NAME: "Source Publisher"
     depends_on:

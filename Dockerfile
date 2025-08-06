@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-slim
+FROM openjdk:24-jdk-slim
 
 LABEL maintainer="Message Bridge Service"
 LABEL version="1.0.0"
@@ -10,11 +10,21 @@ COPY gradle ./gradle
 COPY gradlew build.gradle ./
 COPY src ./src
 
-RUN chmod +x ./gradlew
+RUN chmod +x ./gradlew && ./gradlew build --no-daemon -x test
 
-RUN ./gradlew build --no-daemon -x test
-
-RUN mv build/libs/*.jar app.jar
+# Better way to check for JAR files and move them
+RUN if ls build/libs/*.jar 1> /dev/null 2>&1; then \
+        echo "JAR files found:"; \
+        ls -la build/libs/*.jar; \
+        # Take the first JAR file found (or use a more specific pattern if needed)
+        FIRST_JAR=$(ls build/libs/*.jar | head -n 1); \
+        echo "Moving $FIRST_JAR to app.jar"; \
+        mv "$FIRST_JAR" app.jar; \
+    else \
+        echo "JAR file not found. Build may have failed."; \
+        ls -la build/libs; \
+        exit 1; \
+    fi
 
 RUN rm -rf gradle gradlew build.gradle src build
 

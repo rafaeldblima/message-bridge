@@ -13,8 +13,8 @@ spring:
             spring:
               rabbitmq:
                 addresses: ${RABBITMQ_SOURCE_HOST:localhost}:${RABBITMQ_SOURCE_PORT:5672}
-                username: ${RABBITMQ_SOURCE_USER:admin}
-                password: ${RABBITMQ_SOURCE_PASSWORD:admin123}
+                username: ${RABBITMQ_SOURCE_USER:guest}
+                password: ${RABBITMQ_SOURCE_PASSWORD:guest}
                 virtual-host: ${RABBITMQ_SOURCE_VHOST:/}
         rabbit-destination:
           type: rabbit
@@ -22,8 +22,8 @@ spring:
             spring:
               rabbitmq:
                 addresses: ${RABBITMQ_DESTINATION_HOST:localhost}:${RABBITMQ_DESTINATION_PORT:5673}
-                username: ${RABBITMQ_DESTINATION_USER:admin}
-                password: ${RABBITMQ_DESTINATION_PASSWORD:admin123}
+                username: ${RABBITMQ_DESTINATION_USER:guest}
+                password: ${RABBITMQ_DESTINATION_PASSWORD:guest}
                 virtual-host: ${RABBITMQ_DESTINATION_VHOST:/}
       
       bindings:

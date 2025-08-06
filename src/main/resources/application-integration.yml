@@ -1,0 +1,19 @@
+spring:
+  cloud:
+    stream:
+      bindings:
+        processMessage-out-0:
+          destination: destination.queue
+          binder: rabbit-destination
+          producer:
+            # Use the explicit routing key to ensure messages go to the destination queue
+            routing-key-expression: '''destination'''
+      rabbit:
+        bindings:
+          processMessage-out-0:
+            producer:
+              # Set routing key and exchange to direct messages properly
+              routing-key-expression: '''destination'''
+              exchange-type: direct
+              exchange: destination.queue
+              durable: true
