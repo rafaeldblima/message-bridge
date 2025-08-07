@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Spring Cloud Stream message bridge service that forwards messages between two separate RabbitMQ instances without modification. The service uses Spring Boot 3.3.5 with Java 21 and employs the modern Spring Cloud Stream functional programming model.
+This is a Spring Cloud Stream message bridge service that forwards messages between two separate RabbitMQ instances without modification. The service uses Spring Boot 3.4.5 with Java 24 and employs the modern Spring Cloud Stream functional programming model.
 
 ### Core Architecture
 
