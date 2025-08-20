@@ -4,7 +4,7 @@ spring:
   
   cloud:
     function:
-      definition: processMessage
+      definition: processMessage;processRabbitToKafka;processKafkaToRabbit
     stream:
       binders:
         rabbit-source:
@@ -25,8 +25,27 @@ spring:
                 username: ${RABBITMQ_DESTINATION_USER:guest}
                 password: ${RABBITMQ_DESTINATION_PASSWORD:guest}
                 virtual-host: ${RABBITMQ_DESTINATION_VHOST:/}
+        kafka-source:
+          type: kafka
+          environment:
+            spring:
+              kafka:
+                bootstrap-servers: ${KAFKA_SOURCE_BROKERS:localhost:9092}
+                consumer:
+                  group-id: message-bridge-kafka-source
+                  auto-offset-reset: earliest
+        kafka-destination:
+          type: kafka
+          environment:
+            spring:
+              kafka:
+                bootstrap-servers: ${KAFKA_DESTINATION_BROKERS:localhost:9093}
+                producer:
+                  key-serializer: org.apache.kafka.common.serialization.StringSerializer
+                  value-serializer: org.apache.kafka.common.serialization.StringSerializer
       
       bindings:
+        # Original RabbitMQ to RabbitMQ bridge
         processMessage-in-0:
           destination: source.queue
           group: message-bridge-group
@@ -37,6 +56,32 @@ spring:
             back-off-multiplier: 2.0
         processMessage-out-0:
           destination: destination.queue
+          binder: rabbit-destination
+        
+        # RabbitMQ to Kafka bridge
+        processRabbitToKafka-in-0:
+          destination: rabbit.to.kafka.queue
+          group: rabbit-to-kafka-group
+          binder: rabbit-source
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
+            back-off-multiplier: 2.0
+        processRabbitToKafka-out-0:
+          destination: kafka-destination-topic
+          binder: kafka-destination
+        
+        # Kafka to RabbitMQ bridge
+        processKafkaToRabbit-in-0:
+          destination: kafka-source-topic
+          group: kafka-to-rabbit-group
+          binder: kafka-source
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 1000
+            back-off-multiplier: 2.0
+        processKafkaToRabbit-out-0:
+          destination: kafka.to.rabbit.queue
           binder: rabbit-destination
       
       rabbit:
@@ -51,6 +96,26 @@ spring:
               routing-key-expression: '''destination'''
               exchange-type: direct
               durable: true
+          processRabbitToKafka-in-0:
+            consumer:
+              acknowledge-mode: auto
+              durable: true
+              prefetch: 10
+          processKafkaToRabbit-out-0:
+            producer:
+              routing-key-expression: '''kafka-to-rabbit'''
+              exchange-type: direct
+              durable: true
+      
+      kafka:
+        bindings:
+          processRabbitToKafka-out-0:
+            producer:
+              key-serializer: org.apache.kafka.common.serialization.StringSerializer
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+          processKafkaToRabbit-in-0:
+            consumer:
+              auto-offset-reset: earliest
 
 server:
   port: ${SERVER_PORT:8080}

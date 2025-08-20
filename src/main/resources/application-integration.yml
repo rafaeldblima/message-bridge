@@ -1,19 +1,59 @@
 spring:
   cloud:
+    function:
+      definition: processMessage;processRabbitToKafka;processKafkaToRabbit
     stream:
       bindings:
+        # Original RabbitMQ to RabbitMQ bridge
         processMessage-out-0:
           destination: destination.queue
           binder: rabbit-destination
           producer:
-            # Use the explicit routing key to ensure messages go to the destination queue
             routing-key-expression: '''destination'''
+        
+        # RabbitMQ to Kafka bridge  
+        processRabbitToKafka-in-0:
+          destination: rabbit.to.kafka.queue
+          group: rabbit-to-kafka-group
+          binder: rabbit-source
+        processRabbitToKafka-out-0:
+          destination: kafka-destination-topic
+          binder: kafka-destination
+          
+        # Kafka to RabbitMQ bridge
+        processKafkaToRabbit-in-0:
+          destination: kafka-source-topic
+          group: kafka-to-rabbit-group
+          binder: kafka-source
+        processKafkaToRabbit-out-0:
+          destination: kafka.to.rabbit.queue
+          binder: rabbit-destination
+          
       rabbit:
         bindings:
           processMessage-out-0:
             producer:
-              # Set routing key and exchange to direct messages properly
               routing-key-expression: '''destination'''
               exchange-type: direct
               exchange: destination.queue
               durable: true
+          processRabbitToKafka-in-0:
+            consumer:
+              acknowledge-mode: auto
+              durable: true
+              prefetch: 10
+          processKafkaToRabbit-out-0:
+            producer:
+              routing-key-expression: '''kafka-to-rabbit'''
+              exchange-type: direct
+              durable: true
+              
+      kafka:
+        bindings:
+          processRabbitToKafka-out-0:
+            producer:
+              key-serializer: org.apache.kafka.common.serialization.StringSerializer
+              value-serializer: org.apache.kafka.common.serialization.StringSerializer
+          processKafkaToRabbit-in-0:
+            consumer:
+              auto-offset-reset: earliest
